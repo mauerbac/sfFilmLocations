@@ -29,6 +29,12 @@
 
 	}
 
+	function fetchTitles(){
+		global $db;
+		$q= "SELECT DISTINCT title FROM `movies` ";
+		return $db->query($q);
+	}
+
 
 
 	

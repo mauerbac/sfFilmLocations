@@ -161,16 +161,63 @@ function fetchData(){
 
 }
 
+
+function getmovieTitles(){
+	$data= fetchTitles();
+
+	$arr= array();
+
+	while ($row = $data->fetch_assoc()) {
+	
+		array_push($arr,  $row['title'] );
+
+	}
+
+	return json_encode($arr);
+
+
+}
+
+$titles= getmovieTitles();
+
 echo <<<END
 <!DOCTYPE html>
 <html> 
 <head> 
   <meta http-equiv="content-type" content="text/html; charset=UTF-8" /> 
   <title>Google Maps Multiple Markers</title> 
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css">
   <script src="http://maps.google.com/maps/api/js?sensor=false" 
           type="text/javascript"></script>
+  <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="//code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
+  <script>
+  $(function() {
+    var availableTags = $titles;
+
+    $( "#tags" ).autocomplete({
+      source: availableTags
+    });
+  });
+  </script>
+
+
+
+
 </head> 
 <body>
+  <form action="" method="post">
+
+  <div class="ui-widget">
+	  <label for="tags">Tags: </label>
+	  <input id="tags"> 
+  </div>
+  	  <input type="submit" value="Search" />
+  </form>
+
+  <br>
+  <br>
+
   <div id="map" style="width: 1000px; height: 500px;"></div>
 
   <script type="text/javascript">
