@@ -1,187 +1,143 @@
 <?php 
-
-ini_set('display_errors', 'On');
-error_reporting(E_ALL);
-include ('constants.php');
-
-include ('database.php');
-
-
-//read SF movie locations
-
-
-$proccessedMovies= array();
-//preProcessing(); 
-
-$bounds= False;
-
 /*
+process.php
+@Matt Auerbach
 
-if(isset($_POST['title']) && $_POST['title'] != "" ){
-	print "here";
-	print $_POST['title'];
-	$bounds=True;
-
-	$movie_json= fetchData($_POST['title']);
-}else{
-	$movie_json= fetchData("");
-}
+PHP Backend Code
 
 */
+
+include ('constants.php');
+include ('database.php');
+
+//used for error debugging
+//ini_set('display_errors', 'On');
+//error_reporting(E_ALL);
+
+//globals 
+$proccessedMovies= array();
+
+
+/* *********
+
+*uncomment this function to re-process the movie data and insert into db
+
+preProcessing(); 
+
+*************/
+
+
 
 //determine which function to call
 if(isset($_GET['function'])) {
     if($_GET['function'] == 'movies') {
 		echo fetchData($_GET['mTitle']);
-
     }else if($_GET['function'] == 'titles'){
     	echo getmovieTitles();
-    }
+    } 
+}else{
+	echo "{invalid function}";
 }
 
-
-
-
-
+/*
+Processes all movie data
+1) retrieve movie data from data.sfgov.org
+2) convert string movie loation to Lat and Long using Google Geocode and places API
+3) create JSON obj
+*/
 function preProcessing(){	
-
-
 	//use SF Data API to retrieve movie locations
 	$url= "http://data.sfgov.org/resource/yitu-d5am.json";
-
 	$response= json_decode(file_get_contents($url),true);
 
-	//print sizeof($response); 
-
-	//print_r($response);
-
+	//keep count of movies
 	$count=0;
-
-
 
 	//iterate through each movie 
 	foreach ($response as $movie){
-		print "<br> ============================ <br>";
-		//print_r ($movie);
-
+		//some movies didn't have location, so skip over them
 		if(!isset($movie['locations'])){
 			print "No location provided";
 			continue;
 		}
 
 		$title= $movie['title'];
-
 		$director= $movie['director'];
 		$year= $movie['release_year'];
 
 		//re-format location 
 		$location= str_replace(" ","+" ,$movie['locations']);
 
-
-		//append SF 
+		//append SF. Appending this drastically improved results. 
 		$location= $location."San+Francisco,+CA";
 
 		$preLocation= $movie['locations'];
 
 		//retrieve long and lat of location 
-		//first, use geocoding API
+		//first, use geocoding API. Set bounds to SF area.
 		$url_geo= "https://maps.googleapis.com/maps/api/geocode/json?address=".$location."&bounds=37.775,-122.4183333&key=".GOOGLE_KEY;
-
-
-		print_r($movie);
 
 		$geocode= json_decode(file_get_contents($url_geo),true);
 
+		//if results from geocode API
 		if(sizeof($geocode['results']) > 0 ){
-			print "in geo code";
-			print_r($geocode);
-
 
 			$loc= $geocode['results'][0]['geometry']['location'];
 			$lat= $loc['lat'];
 			$long= $loc['lng'];
 
+			//insert movie info to DB
 			insertDB($title, $year, $director, $lat, $long,$preLocation);
-
 
 		}else{
 
-			exit(1);
-			print "<br>No matches with geocoding";
-			//if no results, try google places API
-			
+			//No results with Geocode -> try Places API
+
+			//places API
 			$url_places="https://maps.googleapis.com/maps/api/place/textsearch/json?query=".$location."&location=37.775,-122.4183333&radius=32186.9&language=en&key=".GOOGLE_KEY;
 		
 			$places= json_decode(file_get_contents($url_places),true);
 
 			//ensure we have a result
-
 			if(sizeof($places['results']) > 0 ){
-
-				print "<br>found result with places API";
 
 				$loc= $places['results'][0]['geometry']['location'];
 				$lat= $loc['lat'];
 				$long= $loc['lng'];
 
+				//insert entry to DB
 				insertDB($title, $year, $director, $lat, $long,$preLocation);
 
-
-			//no response with both APIS
 			}else{
-
-				print_r($places);
-
-				print $url_places;
-
+				//no response from APIs
 				print "<br>No Geocoding results :(  ";
-
-
 			}
-
-
 		} 
-
-
+		//increment count
 		$count= $count + 1;
-
-		//if ($count > 2){
-
-		//}
-		exit(1);
-	} //end loop 
-
-	print $count;
-
-	
-	print_r($proccessedMovies);
-
-
+	} //end interating through all movies 
 	closeDB();
-
-
 }
 
 
+//fetch movies from database -- filtering by title 
 function fetchData($title){
 	global $proccessedMovies;
 
+	//call DB helper function
 	$data= fetch($title);
 
-	//print_r ($data);
 
 	$length = mysqli_num_rows($data);
 
+	//malformed or we don't have the movie
 	if ($length<1){
 		return json_encode(array("success"=>false, "error"=> "Movie $title not in database."));
 	}
 
+	//iterate through each db entry
 	while ($row = $data->fetch_assoc()) {
-
-		//do filtering here!!!!!
-
-  		//print_r($row);
-  		//print "<br>";
+		//could add more filtering here
 
   		$title= $row['title'];
   		$year= $row['year'];
@@ -190,36 +146,31 @@ function fetchData($title){
   		$long= $row['long'];
   		$location= $row['location'];
 
+  		//builld JSON obj
   		$entry= array("title"=> $title, "year"=> $year, "director"=> $director, "lat"=> $lat, "long"=> $long, "location"=> $location);
 
   		array_push($proccessedMovies, $entry);
 	
 	}
 
-
-	$movie_json= json_encode($proccessedMovies);
-
-	//print_r($movie_json);
-
-	return $movie_json;
+	return json_encode($proccessedMovies);
 
 }
 
-
+//only fetch movie titles from autofill 
 function getmovieTitles(){
+	//call db helper function
 	$data= fetchTitles();
 
 	$arr= array();
 
+	//interate through each title, creating json object
 	while ($row = $data->fetch_assoc()) {
 	
 		array_push($arr,  $row['title'] );
 
 	}
-
 	return json_encode($arr);
-
-
 }
 
 
