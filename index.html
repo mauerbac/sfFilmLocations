@@ -2,6 +2,11 @@
 <html> 
 <head> 
   <meta http-equiv="content-type" content="text/html; charset=UTF-8" /> 
+  <meta name="description" content="Google Map displays locations of films shot in San Francisco.">
+  <meta name="keywords" content="film locations, san francisco, film sets, movie film locations, film, movie">
+  <meta name="author" content="Matt Auerbach (@mauerbac)">
+
+
   <title>Location Scout</title> 
   <link rel="stylesheet" href="//code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css">
 
@@ -128,7 +133,7 @@ getMoviesTitles(function(result){
           google.maps.event.addListener(marker, 'click', (function(marker, i) {
             return function() {
 
-              var content= '<h3>'+locations[i].title+' ('+locations[i].year+') </h3>  <br> '+ locations[i].director + '<br> '+ locations[i].location;
+              var content= '<h4 style="margin-top: 2px;margin-bottom: -6px;">'+locations[i].title+' ('+locations[i].year+') </h4>  <br> <b>Director: </b> '+ locations[i].director + '<br> <b> Location: </b> '+ locations[i].location;
               infowindow.setContent(content);
               infowindow.open(map, marker);
             }
@@ -162,6 +167,9 @@ getMoviesTitles(function(result){
 
 </head> 
 <body>
+
+  <a href="https://github.com/mauerbac/sfFilmLocations"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"></a>
+
 
     <!-- Main jumbotron for a primary marketing message or call to action -->
     <div class="jumbotron">
