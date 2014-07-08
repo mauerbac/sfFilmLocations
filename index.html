@@ -8,11 +8,14 @@
           type="text/javascript"></script>
   <script src="//code.jquery.com/jquery-1.10.2.js"></script>
   <script src="//code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
+  <script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer.js"></script>
+
   <script>
   
   var map;
   var infowindow; 
   var markers=[];
+  var markerCluster;
 
   $(document).ready(function(){
     loadMap();
@@ -93,14 +96,14 @@ getMoviesTitles(function(result){
 
   }
     function loadMovies(title){
+      var clustering=true;
 
-      clearOverlays();
+      if(title!=""){
+         clearOverlays();
+         clustering=false;
+      }
     
       var infowindow = new google.maps.InfoWindow();
-
-
-      var i;
-
 
       getMovies(function(result){
         var locations=jQuery.parseJSON(result);
@@ -108,13 +111,15 @@ getMoviesTitles(function(result){
 
         //clear markers
 
-        for (i = 0; i < locations.length; i++) {  
+        for (var i = 0; i < locations.length; i++) {  
           var marker = new google.maps.Marker({
             position: new google.maps.LatLng(locations[i].lat, locations[i].long),
             map: map
           });
 
           markers.push(marker);
+
+
 
 
           google.maps.event.addListener(marker, 'click', (function(marker, i) {
@@ -127,15 +132,23 @@ getMoviesTitles(function(result){
           })(marker, i));
         }
 
+        if(clustering){
+          markerCluster = new MarkerClusterer(map, markers);
+        }
+
      },title);
   }
 
   function clearOverlays() {
+
     for (var i = 0; i < markers.length; i++ ) {
       markers[i].setMap(null);
     }
     markers.length = 0;
-}
+    markers=[];
+    markerCluster.clearMarkers();
+
+   }
 
 
 
