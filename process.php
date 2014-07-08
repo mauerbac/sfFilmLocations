@@ -172,6 +172,10 @@ function fetchData($title){
 
 	$length = mysqli_num_rows($data);
 
+	if ($length<1){
+		return json_encode(array("success"=>false, "error"=> "Movie $title not in database."));
+	}
+
 	while ($row = $data->fetch_assoc()) {
 
 		//do filtering here!!!!!

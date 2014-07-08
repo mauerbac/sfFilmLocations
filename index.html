@@ -8,14 +8,14 @@
 
 
   <title>Location Scout</title> 
-  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css">
 
+
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css">
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
 
-  <script src="http://maps.google.com/maps/api/js?sensor=false" 
-          type="text/javascript"></script>
-  <script src="//code.jquery.com/jquery-1.10.2.js"></script>
-  <script src="//code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
+  <script src="http://maps.google.com/maps/api/js?sensor=false" type="text/javascript"></script>
+  <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="http://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
   <script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer.js"></script>
 
   <script>
@@ -89,6 +89,9 @@ getMoviesTitles(function(result){
         success: callback,
         error: function (a,b,c) {
             alert('Bummer: there was an error!');
+            alert(a);
+            alert(b);
+            alert(c);
         },
      });
   }
@@ -114,8 +117,16 @@ getMoviesTitles(function(result){
       var infowindow = new google.maps.InfoWindow();
 
       getMovies(function(result){
+
         var locations=jQuery.parseJSON(result);
-        
+
+        //movie not in database
+        if(locations['success']==false){
+          alert(locations['error']);
+          $("#tags").val("");
+          loadMovies("");
+          return;
+        }  
 
         //clear markers
 
@@ -159,9 +170,6 @@ getMoviesTitles(function(result){
 
    }
 
-
-
-
   </script>
 
 
@@ -186,7 +194,7 @@ getMoviesTitles(function(result){
 
 
   <center>
-    <form id="title-filter" name="title-filter">
+    <form id="title-filter" name="title-filter" method="post">
   	  <h4>Filter by Movie Title: </h4>
   	  <input placeholder="Blue Jasmine" type="text" name="title" id="tags"> 
     	  <button type="button" id="sub">Submit</button>
