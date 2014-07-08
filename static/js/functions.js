@@ -119,7 +119,10 @@ function loadMovies(title){
 
     //if clustering enabled -> enable it! 
     if(clustering){
-      markerCluster = new MarkerClusterer(map, markers);
+      markerCluster = new MarkerClusterer(map, markers,{
+        //decluster after certain zoom level 
+        maxZoom:15
+      });
     }
 
   },title);
