@@ -34,7 +34,7 @@ Development Process
 Other
 -----------
 
-##Testing
+###Testing
 <p> I ran automated tests by using JS to submit difference film titles and checking the response from the server with my correct version of the response. I tested films in my database, as well as malformed titles and films not shot in SF. This allowed me to test the API produced the right response and that the front and backend were communicating. </p>
 
 
