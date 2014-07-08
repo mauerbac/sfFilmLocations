@@ -29,5 +29,21 @@ Development Process
 <p>I needed an architecture where the frontend JS could request a JSON object of the data points from the backend. I built a call-able endpoint that returns films from the database. It takes an optional parameter called title that when provided queries by film title. Try it here: <pre>http://mattsauerbach.com/filmLocations/process.php?function=movies </pre> <pre>http://mattsauerbach.com/filmLocations/process.php?function=movies&mTitle=blue+jasmine </pre>. </p>
 
 ###Frontend
-I used Bootstrap to build a simple and clean UI that would allow the user to view the project overview, view film markers on the map and filter by title. When my application loads, I call JS functions `loadMap()` and `loadMovies()`. This loads the map object on the page and then fills the map with all film makers. The user can then interact with the map and view different markers. Since many films were shot in SF the map looked a bit crowded. I decided to take advantage of the Google Maps library called clustering. I enable this when filtering is desired.  For simplicity, the user is provided with autocompletion search. I used the JQuery library to accomplish this by calling my API for all movie titles. After the user selects their favorite film the submit button (when clicked) calls the `getMovies()` function and we pass in the film title. The API then returns movies with that title. The JS iterates through each movie and creates a marker. Since filtering is enabled we clear the map (`clearOverlays()`), disable clustering and load the created markers.  
+<p>I used Bootstrap to build a simple and clean UI that would allow the user to view the project overview, view film markers on the map and filter by title. When my application loads, I call JS functions `loadMap()` and `loadMovies()`. This loads the map object on the page and then fills the map with all film makers. The user can then interact with the map and view different markers. Since many films were shot in SF the map looked a bit crowded. I decided to take advantage of the Google Maps library called clustering. I enable this when filtering is desired.  For simplicity, the user is provided with autocompletion search. I used the JQuery library to accomplish this by calling my API for all movie titles. After the user selects their favorite film the submit button (when clicked) calls the `getMovies()` function and we pass in the film title. The API then returns movies with that title. The JS iterates through each movie and creates a marker. Since filtering is enabled we clear the map (`clearOverlays()`), disable clustering and load the created markers. </p>
+
+Other
+-----------
+
+##Testing
+<p> I ran automated tests by using JS to submit difference film titles and checking the response from the server with my correct version of the response. I tested films in my database, as well as malformed titles and films not shot in SF. This allowed me to test the API produced the right response and that the front and backend were communicating. </p>
+
+
+###Improvements 
+Overall, I’m proud of this project as it encapsulates many of my skills. Since the task was general I didn’t want to hone in too closely into a specific detail. 
+If I were to spend more time I would:
+  1. A few films were shot in the same location and therefore have the same lat/long points. Google Maps displays only the top point, which makes it impossible to view other films shot at this location. Others have used methods to precisely scatter identical points to make them all visible.  
+  2. Increase efficiently with less backend calls. Anytime the user filters, clears or reloads the map we call the API. It would be better to call the API once and store all the data points locally. Then filter the movies on the frontend and when it’s necessary to reload use the local data rather than calling the backend. 
+  3. Improve the UI. Add film posters and IMBD links to info windows.
+  4. Add more filters (year, actress, etc…) 
+  5. Further improve the pre-process algorithm to better identify coordinates. 
 
