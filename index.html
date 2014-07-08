@@ -24,6 +24,14 @@
 
 
       });
+
+      $( "#clear" ).click(function() {
+       $("#tags").val(""); 
+       loadMovies("");
+      });
+
+
+
     });
 
 
@@ -99,7 +107,6 @@ getMoviesTitles(function(result){
         
 
         //clear markers
-        debugger;
 
         for (i = 0; i < locations.length; i++) {  
           var marker = new google.maps.Marker({
@@ -113,7 +120,7 @@ getMoviesTitles(function(result){
           google.maps.event.addListener(marker, 'click', (function(marker, i) {
             return function() {
 
-              var content= '<h4>'+locations[i].title+'</h4>';
+              var content= '<h3>'+locations[i].title+' ('+locations[i].year+') </h3>  <br> '+ locations[i].director + '<br> '+ locations[i].location;
               infowindow.setContent(content);
               infowindow.open(map, marker);
             }
@@ -149,6 +156,7 @@ getMoviesTitles(function(result){
   	  <button type="button" id="sub">Submit</button>
   </form>
    
+   <button type="button" id="clear">Clear</button>
 
   <br>
   <br>

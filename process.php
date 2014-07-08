@@ -77,6 +77,12 @@ function preProcessing(){
 		//re-format location 
 		$location= str_replace(" ","+" ,$movie['locations']);
 
+
+		//append SF 
+		$location= $location."San+Francisco,+CA";
+
+		$preLocation= $movie['locations'];
+
 		//retrieve long and lat of location 
 		//first, use geocoding API
 		$url_geo= "https://maps.googleapis.com/maps/api/geocode/json?address=".$location."&bounds=37.775,-122.4183333&key=".GOOGLE_KEY;
@@ -87,16 +93,20 @@ function preProcessing(){
 		$geocode= json_decode(file_get_contents($url_geo),true);
 
 		if(sizeof($geocode['results']) > 0 ){
-			//print_r($geocode);
+			print "in geo code";
+			print_r($geocode);
+
 
 			$loc= $geocode['results'][0]['geometry']['location'];
 			$lat= $loc['lat'];
 			$long= $loc['lng'];
 
-			insertDB($title, $year, $director, $lat, $long,$location);
+			insertDB($title, $year, $director, $lat, $long,$preLocation);
 
 
 		}else{
+
+			exit(1);
 			print "<br>No matches with geocoding";
 			//if no results, try google places API
 			
@@ -114,7 +124,7 @@ function preProcessing(){
 				$lat= $loc['lat'];
 				$long= $loc['lng'];
 
-				insertDB($title, $year, $director, $lat, $long,$location);
+				insertDB($title, $year, $director, $lat, $long,$preLocation);
 
 
 			//no response with both APIS
@@ -138,7 +148,7 @@ function preProcessing(){
 		//if ($count > 2){
 
 		//}
-
+		exit(1);
 	} //end loop 
 
 	print $count;
@@ -176,7 +186,7 @@ function fetchData($title){
   		$long= $row['long'];
   		$location= $row['location'];
 
-  		$entry= array("title"=> $title, "year"=> $year, "director"=> $director, "lat"=> $lat, "long"=> $long);
+  		$entry= array("title"=> $title, "year"=> $year, "director"=> $director, "lat"=> $lat, "long"=> $long, "location"=> $location);
 
   		array_push($proccessedMovies, $entry);
 	
