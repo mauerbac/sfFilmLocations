@@ -20,6 +20,10 @@
 	//fetches movies
 	function fetch($title){
 		global $db;
+
+		//sanitize input
+		$title= $db->real_escape_string($title);
+
 		if ($title == ""){
 			$q="SELECT * FROM `movies`";
 		}else{
