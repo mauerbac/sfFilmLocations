@@ -112,7 +112,7 @@ getMoviesTitles(function(result){
           var marker = new google.maps.Marker({
             position: new google.maps.LatLng(locations[i].lat, locations[i].long),
             map: map,
-            icon: 'icon.png'
+            icon: 'static/pics/icon.png'
           });
 
           markers.push(marker);
