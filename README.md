@@ -5,8 +5,8 @@ This web app allows the user to view locations of films shot in San Francisco. T
 
 
 
-![homepage](static/pics/home.jpg)
-![homepage1](static/pics/home1.jpg)
+![homepage](static/pics/home.png)
+![homepage1](static/pics/home1.png)
 
 
 
