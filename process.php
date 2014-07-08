@@ -8,12 +8,40 @@ include ('database.php');
 
 
 //read SF movie locations
-print "test";
+
 
 $proccessedMovies= array();
 //preProcessing(); 
 
-$movie_json= fetchData();
+$bounds= False;
+
+/*
+
+if(isset($_POST['title']) && $_POST['title'] != "" ){
+	print "here";
+	print $_POST['title'];
+	$bounds=True;
+
+	$movie_json= fetchData($_POST['title']);
+}else{
+	$movie_json= fetchData("");
+}
+
+*/
+
+//determine which function to call
+if(isset($_GET['function'])) {
+    if($_GET['function'] == 'movies') {
+		echo fetchData($_GET['mTitle']);
+
+    }else if($_GET['function'] == 'titles'){
+    	echo getmovieTitles();
+    }
+}
+
+
+
+
 
 function preProcessing(){	
 
@@ -125,10 +153,12 @@ function preProcessing(){
 }
 
 
-function fetchData(){
+function fetchData($title){
 	global $proccessedMovies;
 
-	$data= fetch();
+	$data= fetch($title);
+
+	//print_r ($data);
 
 	$length = mysqli_num_rows($data);
 
@@ -178,76 +208,5 @@ function getmovieTitles(){
 
 }
 
-$titles= getmovieTitles();
 
-echo <<<END
-<!DOCTYPE html>
-<html> 
-<head> 
-  <meta http-equiv="content-type" content="text/html; charset=UTF-8" /> 
-  <title>Google Maps Multiple Markers</title> 
-  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css">
-  <script src="http://maps.google.com/maps/api/js?sensor=false" 
-          type="text/javascript"></script>
-  <script src="//code.jquery.com/jquery-1.10.2.js"></script>
-  <script src="//code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
-  <script>
-  $(function() {
-    var availableTags = $titles;
-
-    $( "#tags" ).autocomplete({
-      source: availableTags
-    });
-  });
-  </script>
-
-
-
-
-</head> 
-<body>
-  <form action="" method="post">
-
-  <div class="ui-widget">
-	  <label for="tags">Tags: </label>
-	  <input id="tags"> 
-  </div>
-  	  <input type="submit" value="Search" />
-  </form>
-
-  <br>
-  <br>
-
-  <div id="map" style="width: 1000px; height: 500px;"></div>
-
-  <script type="text/javascript">
-
-    var map = new google.maps.Map(document.getElementById('map'), {
-      zoom: 10,
-      center: new google.maps.LatLng(37.775,-122.4183333),
-      mapTypeId: google.maps.MapTypeId.ROADMAP
-    });
-    var infowindow = new google.maps.InfoWindow();
-
-    var marker, i;
-
-    var locations= $movie_json;
-
-    for (i = 0; i < locations.length; i++) {  
-      marker = new google.maps.Marker({
-        position: new google.maps.LatLng(locations[i].lat, locations[i].long),
-        map: map
-      });
-
-      google.maps.event.addListener(marker, 'click', (function(marker, i) {
-        return function() {
-          infowindow.setContent(locations[i].title);
-          infowindow.open(map, marker);
-        }
-      })(marker, i));
-    }
-  </script>
-</body>
-</html>
-END;
 ?>

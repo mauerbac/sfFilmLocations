@@ -16,10 +16,14 @@
 
 	}
 
-	function fetch(){
+	function fetch($title){
 		global $db;
+		if ($title == ""){
+			$q="SELECT * FROM `movies`";
+		}else{
+			$q="SELECT * FROM `movies` where `title` = '".$title."'";
+		}
 
-		$q="SELECT * FROM `movies`";
 		return $db->query($q);
 	}
 
